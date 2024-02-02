@@ -3,8 +3,8 @@ app_name = dvm_dataload
 version = 1.0
 
 [csv]
-watch_dir = ./shared_folder
-backup_dir = ./processed
+watch_dir = /home/ds/sambashare
+backup_dir = /home/ds/processed
 securenow_prefix = securenow
 pdw_prefix = pdw
 state_dir = ./state
