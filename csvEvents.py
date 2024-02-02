@@ -55,17 +55,12 @@ class integration(object):
                 self.ds.logger.error('Failed to read csv data for file: %s' %file_name)
                 continue
 
-            if data_type == 'securenow':
-                for event in event_list:
-                    event['app_name'] = 'securenow'
-                    self.ds.writeJSONEvent(event, JSON_field_mappings = self.JSON_field_mappings_securenow)
-            elif data_type == 'pdw':
-                for event in event_list:
-                    event['app_name'] = 'pdw'
-                    self.ds.writeJSONEvent(event, JSON_field_mappings = self.JSON_field_mappings_pdw)
-            else:
-                self.ds.logger.error('Found data type. Skipping: %s' %data_type)
+            if data_type == None:
+                self.ds.logger.error('invalid data type. Skipping: %s' %data_type)
                 continue
+
+            for event in event_list:
+                self.ds.writeJSONEvent(event, JSON_field_mappings = self.JSON_field_mappings_securenow, app_name=data_type)
 
             self.ds.logger.info('Backing up file: %s to directory %s' %(file_name, self.backup_dir))
             try:
