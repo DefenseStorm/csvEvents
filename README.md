@@ -3,6 +3,7 @@ Bank First Integraiton
 to pull this repository and submodules:
 
 cd /usr/local
+
 sudo git clone --recurse-submodules https://github.com/DefenseStorm/csvEvents.git
 
 1. If this is the first integration on this DVM, Do the following:
