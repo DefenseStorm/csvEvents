@@ -1,0 +1,11 @@
+[json]
+app_name = dvm_dataload
+version = 1.0
+
+[csv]
+watch_dir = ./shared_folder
+backup_dir = ./processed
+securenow_prefix = securenow
+pdw_prefix = pdw
+state_dir = ./state
+pid_file = ./pid
