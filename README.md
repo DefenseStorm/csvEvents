@@ -6,6 +6,8 @@ cd /usr/local
 
 sudo git clone --recurse-submodules https://github.com/DefenseStorm/csvEvents.git
 
+cd csvEvents
+
 1. If this is the first integration on this DVM, Do the following:
 
   sudo cp ds-integration/ds_events.conf /etc/syslog-ng/conf.d
@@ -18,11 +20,12 @@ filter f_messages { level(info,notice,warn) and not facility(auth,authpriv,cron,
 
 
   Restart syslog-ng
-    service syslog-ng restart
+
+  sudo service syslog-ng restart
 
 2. Copy the template config file and update the settings
 
-  cp csvEvents.conf.template csvEvents.conf
+  sudo cp csvEvents.conf.template csvEvents.conf
 
   Put the appropriate configurations in the conf file:
 	watch_dir (same directory as configured in smb.conf)
