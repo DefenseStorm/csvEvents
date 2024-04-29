@@ -60,7 +60,7 @@ class integration(object):
                 continue
 
             for event in event_list:
-                self.ds.writeJSONEvent(event, JSON_field_mappings = self.JSON_field_mappings_securenow, app_name=data_type)
+                self.ds.writeJSONEvent(event, JSON_field_mappings = self.JSON_field_mappings, app_name = data_type)
 
             self.ds.logger.info('Backing up file: %s to directory %s' %(file_name, self.backup_dir))
             try:
@@ -86,6 +86,18 @@ class integration(object):
             return None
         return data
 
+    def readMappingsFile(self, filePath):
+        data = []
+        try:
+            with open(filePath, encoding='utf-8') as mFile:
+                data = json.load(mFile)
+        except Exception as e:
+            self.ds.logger.error("Failed to read Mappings file: %s" %filePath)
+            self.ds.logger.error("Exception {0}".format(str(e)))
+            self.ds.logger.error("%s" %(traceback.format_exc().replace('\n',';')))
+            return None
+        return data
+
     def csv_main(self): 
 
         self.watch_dir = self.ds.config_get('csv', 'watch_dir')
@@ -93,6 +105,7 @@ class integration(object):
         self.state_dir = self.ds.config_get('csv', 'state_dir')
         self.securenow_prefix = self.ds.config_get('csv', 'securenow_prefix')
         self.pdw_prefix = self.ds.config_get('csv', 'pdw_prefix')
+        self.mappings_file = self.ds.config_get('csv', 'mappings_file')
 
         if not os.path.isdir(self.watch_dir):
             self.ds.logger.error('Directory does not exist: %s' %self.watch_dir)
@@ -100,6 +113,10 @@ class integration(object):
 
         if not os.path.isdir(self.backup_dir):
             self.ds.logger.error('Directory does not exist: %s' %self.backup_dir)
+            return
+
+        if not os.path.isfile(self.mappings_file):
+            self.ds.logger.error('Mappings file does not exist: %s' %self.mappings_file)
             return
 
 
@@ -113,38 +130,14 @@ class integration(object):
             last_run = current_time - timedelta(hours = 8)
             self.last_run = last_run.strftime(self.time_format)
 
+        self.JSON_field_mappings = self.readMappingsFile(self.mappings_file)
+
         if not self.checkDirectory():
             self.ds.logger.error('Failed in data run')
+
+        self.ds.log('INFO', "Done With Run")
+
         return
-
-        module_list = ['architect', 'dna', 'secure-now']
-        work_list = []
-        if self.restart_module == None:
-            work_list = module_list
-        else:
-            if self.restart_module not in module_list:
-                self.ds.log('ERROR', 'Invalid module specified: ' + self.restart_module)
-                return None
-            found = False
-            for item in module_list:
-                if not found and self.restart_module != item:
-                    continue
-                else:
-                    found = True
-                work_list.append(item) 
-                
-        self.ds.log('INFO', 'Handling modules: ' + str(work_list))
-
-        for event_type in work_list:
-            if not self.get_csvData(event_type=event_type):
-                self.ds.log('Error', "Something went wrong for event type " + event_type + ".  Check logs above")
-            #else:
-                #for log in event_logs:
-                    #self.ds.writeJSONEvent(log, JSON_field_mappings = self.JSON_field_mappings)
-
-        self.ds.set_state(self.state_dir, self.current_run)
-        self.ds.log('INFO', "Done Sending Notifications")
-
 
     def run(self):
         try:
