@@ -22,12 +22,6 @@ from html.parser import HTMLParser
 
 class integration(object):
 
-    JSON_field_mappings_pdw = {
-    }
-    JSON_field_mappings_securenow = {
-    }
-
-
     def checkDirectory(self):
         try:
             file_list = [f for f in listdir(self.watch_dir) if isfile(join(self.watch_dir, f))]
