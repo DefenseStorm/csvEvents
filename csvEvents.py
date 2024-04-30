@@ -30,9 +30,13 @@ class integration(object):
             self.ds.logger.error("Exception {0}".format(str(e)))
             self.ds.logger.error("%s" %(traceback.format_exc().replace('\n',';')))
             return None
+        print(file_list)
         for file_name in file_list:
             data_type = None
             self.ds.logger.info("Reading file: %s" %(file_name))
+
+            for file_type in self.event_mappings.keys():
+                print(file_type)
 
             if self.securenow_prefix in file_name:
                 self.ds.logger.info('Found SecureNow file: %s' %file_name)
@@ -99,7 +103,8 @@ class integration(object):
         self.state_dir = self.ds.config_get('csv', 'state_dir')
         self.securenow_prefix = self.ds.config_get('csv', 'securenow_prefix')
         self.pdw_prefix = self.ds.config_get('csv', 'pdw_prefix')
-        self.mappings_file = self.ds.config_get('csv', 'mappings_file')
+        self.field_mappings_file = self.ds.config_get('csv', 'field_mappings_file')
+        self.event_mappings_file = self.ds.config_get('csv', 'event_mappings_file')
 
         if not os.path.isdir(self.watch_dir):
             self.ds.logger.error('Directory does not exist: %s' %self.watch_dir)
@@ -109,22 +114,15 @@ class integration(object):
             self.ds.logger.error('Directory does not exist: %s' %self.backup_dir)
             return
 
-        if not os.path.isfile(self.mappings_file):
-            self.ds.logger.error('Mappings file does not exist: %s' %self.mappings_file)
+        if not os.path.isfile(self.field_mappings_file):
+            self.ds.logger.error('Field Mappings file does not exist: %s' %self.mappings_file)
+            return
+        if not os.path.isfile(self.event_mappings_file):
+            self.ds.logger.error('Event Mappings file does not exist: %s' %self.mappings_file)
             return
 
-
-        self.last_run = self.ds.get_state(self.state_dir)
-        self.time_format = "%Y-%m-%dT%H:%M:%S"
-        self.limit = 100
-        current_time = datetime.utcnow()
-        self.current_run = current_time.strftime(self.time_format)
-
-        if self.last_run == None:
-            last_run = current_time - timedelta(hours = 8)
-            self.last_run = last_run.strftime(self.time_format)
-
-        self.JSON_field_mappings = self.readMappingsFile(self.mappings_file)
+        self.JSON_field_mappings = self.readMappingsFile(self.field_mappings_file)
+        self.event_mappings = self.readMappingsFile(self.event_mappings_file)
 
         if not self.checkDirectory():
             self.ds.logger.error('Failed in data run')
