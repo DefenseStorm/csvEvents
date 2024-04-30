@@ -7,7 +7,5 @@ watch_dir = /home/ds/sambashare
 backup_dir = /home/ds/processed
 field_mappings_file = field_mappings.json
 event_mappings_file = event_mappings.json
-securenow_prefix = securenow
-pdw_prefix = pdw
 state_dir = ./state
 pid_file = ./pid

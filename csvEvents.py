@@ -30,22 +30,18 @@ class integration(object):
             self.ds.logger.error("Exception {0}".format(str(e)))
             self.ds.logger.error("%s" %(traceback.format_exc().replace('\n',';')))
             return None
-        print(file_list)
+
         for file_name in file_list:
             data_type = None
-            self.ds.logger.info("Reading file: %s" %(file_name))
-
+            self.ds.logger.info("Checking file: %s" %(file_name))
+            data_type = None
             for file_type in self.event_mappings.keys():
-                print(file_type)
+                if file_type in file_name:
+                    self.ds.logger.info("Found file type: %s" %(file_type))
+                    data_type = file_type
 
-            if self.securenow_prefix in file_name:
-                self.ds.logger.info('Found SecureNow file: %s' %file_name)
-                data_type = 'securenow'
-            elif self.pdw_prefix in file_name:
-                self.ds.logger.info('Found PDW file: %s' %file_name)
-                data_type = 'pdw'
-            else:
-                self.ds.logger.error('Found unexpected file. Skipping: %s' %file_name)
+            if data_type == None:
+                self.ds.logger.info("No matching type for file. Skipping: %s" %(file_name))
                 continue
 
             event_list = self.readCSVFile(self.watch_dir + '/' + file_name)
@@ -101,8 +97,6 @@ class integration(object):
         self.watch_dir = self.ds.config_get('csv', 'watch_dir')
         self.backup_dir = self.ds.config_get('csv', 'backup_dir')
         self.state_dir = self.ds.config_get('csv', 'state_dir')
-        self.securenow_prefix = self.ds.config_get('csv', 'securenow_prefix')
-        self.pdw_prefix = self.ds.config_get('csv', 'pdw_prefix')
         self.field_mappings_file = self.ds.config_get('csv', 'field_mappings_file')
         self.event_mappings_file = self.ds.config_get('csv', 'event_mappings_file')
 
