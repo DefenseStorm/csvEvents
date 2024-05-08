@@ -9,3 +9,5 @@ field_mappings_file = field_mappings.json
 event_mappings_file = event_mappings.json
 state_dir = ./state
 pid_file = ./pid
+timezone_string = US/Central
+timezone_fields =
