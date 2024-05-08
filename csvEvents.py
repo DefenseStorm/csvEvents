@@ -14,6 +14,7 @@ import base64
 from os import listdir
 from os.path import isfile, join
 import csv
+import pytz
 
 sys.path.insert(0, './ds-integration')
 from DefenseStorm import DefenseStorm
@@ -54,6 +55,13 @@ class integration(object):
                 continue
 
             for event in event_list:
+                if self.timezone_string != None:
+                    for field in self.timezone_fields:
+                        if field in event.keys() and event[field] != '':
+                            print(event[field])
+                            new_time = pytz.timezone(self.timezone_string).localize(datetime.strptime(event[field], '%Y-%m-%dT%H:%M:%S'))
+                            event[field] = new_time.isoformat()
+                            print(event[field])
                 self.ds.writeJSONEvent(event, JSON_field_mappings = self.JSON_field_mappings, app_name = data_type)
 
             self.ds.logger.info('Backing up file: %s to directory %s' %(file_name, self.backup_dir))
@@ -99,6 +107,14 @@ class integration(object):
         self.state_dir = self.ds.config_get('csv', 'state_dir')
         self.field_mappings_file = self.ds.config_get('csv', 'field_mappings_file')
         self.event_mappings_file = self.ds.config_get('csv', 'event_mappings_file')
+        timezone_string = self.ds.config_get('csv', 'timezone_string')
+        self.timezone_fields = self.ds.config_get('csv', 'timezone_fields').split(',')
+        if timezone_string in pytz.all_timezones:
+            self.timezone_string = timezone_string
+            self.ds.logger.info('Found timezone: %s' %self.timezone_string)
+        else:
+            self.ds.logger.warning('Invalid timezone string detected "%s".  Continuing without setting timezone' %timezone_string)
+            self.timezone_string = None
 
         if not os.path.isdir(self.watch_dir):
             self.ds.logger.error('Directory does not exist: %s' %self.watch_dir)
