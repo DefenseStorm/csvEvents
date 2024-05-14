@@ -44,7 +44,7 @@ class integration(object):
             if data_type == None:
                 self.ds.logger.info("No matching type for file. Skipping: %s" %(file_name))
                 continue
-
+            '''
             event_list = self.readCSVFile(self.watch_dir + '/' + file_name)
             if event_list == None:
                 self.ds.logger.error('Failed to read csv data for file: %s' %file_name)
@@ -53,8 +53,8 @@ class integration(object):
             if data_type == None:
                 self.ds.logger.error('invalid data type. Skipping: %s' %data_type)
                 continue
-
-            for event in event_list:
+            '''
+            for event in self.readCSVFile(self.watch_dir + '/' + file_name):
                 if self.timezone_string != None:
                     for field in self.timezone_fields:
                         if field in event.keys() and event[field] != '':
@@ -78,13 +78,17 @@ class integration(object):
             with open(csvFilePath, encoding='utf-8') as csvf:
                 csvReader = csv.DictReader(csvf)
                 for row in csvReader:
+                    yield row
+                '''
+                for row in csvReader:
                     data.append(row)
+                '''
         except Exception as e:
             self.ds.logger.error("Failed to read CSV file: %s" %csvFilePath)
             self.ds.logger.error("Exception {0}".format(str(e)))
             self.ds.logger.error("%s" %(traceback.format_exc().replace('\n',';')))
             return None
-        return data
+        return
 
     def readMappingsFile(self, filePath):
         data = []
