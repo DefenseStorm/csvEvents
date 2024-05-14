@@ -57,7 +57,7 @@ class integration(object):
             count = 0
             for event in self.readCSVFile(self.watch_dir + '/' + file_name):
                 if count >= 1000:
-                    time.sleep(4)
+                    time.sleep(self.flush_time)
                     count = 0
                 count += 1
                 if self.timezone_string != None:
@@ -109,6 +109,7 @@ class integration(object):
 
     def csv_main(self): 
 
+        self.flush_time = int(self.ds.config_get('csv', 'flush_time'))
         self.watch_dir = self.ds.config_get('csv', 'watch_dir')
         self.backup_dir = self.ds.config_get('csv', 'backup_dir')
         self.state_dir = self.ds.config_get('csv', 'state_dir')
