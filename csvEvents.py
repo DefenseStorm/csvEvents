@@ -54,7 +54,12 @@ class integration(object):
                 self.ds.logger.error('invalid data type. Skipping: %s' %data_type)
                 continue
             '''
+            count = 0
             for event in self.readCSVFile(self.watch_dir + '/' + file_name):
+                if count >= 1000:
+                    time.sleep(4)
+                    count = 0
+                count += 1
                 if self.timezone_string != None:
                     for field in self.timezone_fields:
                         if field in event.keys() and event[field] != '':
