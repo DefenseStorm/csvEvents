@@ -58,10 +58,8 @@ class integration(object):
                 if self.timezone_string != None:
                     for field in self.timezone_fields:
                         if field in event.keys() and event[field] != '':
-                            print(event[field])
                             new_time = pytz.timezone(self.timezone_string).localize(datetime.strptime(event[field], '%Y-%m-%dT%H:%M:%S'))
                             event[field] = new_time.isoformat()
-                            print(event[field])
                 self.ds.writeJSONEvent(event, JSON_field_mappings = self.JSON_field_mappings, app_name = data_type)
 
             self.ds.logger.info('Backing up file: %s to directory %s' %(file_name, self.backup_dir))
